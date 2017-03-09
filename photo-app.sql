@@ -1,0 +1,16 @@
+CREATE TABLE folder (
+id SERIAL PRIMARY KEY,
+name VARCHAR(50)
+);
+
+SELECT * FROM folder;
+
+CREATE TABLE photo (
+id SERIAL PRIMARY KEY,
+folder_id INTEGER REFERENCES folder,
+url VARCHAR(250),
+caption VARCHAR(100)
+);
+
+SELECT * FROM photo;
+

@@ -1,0 +1,11 @@
+.listPhoto {
+    height: 150px;
+    width: auto;
+    padding-top: 12px;
+}
+
+.listPhotoContainer {
+    /*border: 1px solid black;*/
+    margin: 2px;
+    /*background-color: lightgrey;*/
+}

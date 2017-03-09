@@ -1,0 +1,29 @@
+<md-toolbar>
+    <div class="md-toolbar-tools">
+        <md-button ng-href="#!/home" aria-label="Go Back">
+            Go Back
+        </md-button>
+    </div>
+</md-toolbar>
+
+<div flex>
+
+    <md-content layout-padding>
+        <md-grid-list md-cols-gt-md="5" md-cols="3" md-cols-md="8" md-row-height-gt-md="1:1" md-row-height="4:3" md-gutter-gt-md="16px" md-gutter-md="8px" md-gutter="4px">
+            <md-grid-tile ng-repeat="album in ac.albums" style="background-color: #f5f5f5;">
+                <div class="md-list-item-text">
+                    <md-grid-tile-header>
+                        <h3>{{ album }}</h3>
+                    </md-grid-tile-header>
+                    <md-button ng-href="#!/photo/{{album}}" class="md-primary">view Album</md-button>
+                    <md-button ng-click="ac.deleteAlbum(album)" class="md-primary">Delete Album</md-button>
+                </div>
+            </md-grid-tile>
+        </md-grid-list>
+    </md-content>
+
+</div>
+
+<md-button style="" ng-click="ac.showPrompt($event)" class="md-fab md-fab-bottom-right" aria-label="Back">
+    <md-icon md-svg-src="../assets/ic_add_white_24px.svg"></md-icon>
+</md-button>

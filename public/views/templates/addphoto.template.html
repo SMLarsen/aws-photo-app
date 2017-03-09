@@ -1,0 +1,23 @@
+<md-dialog aria-label="Picture Zoom" flex="55">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Add Photo</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-icon md-svg-src="../assets/ic_close_white_24px.svg" aria-label="Close dialog"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <p>Choose file to upload</p>
+        </md-dialog-content>
+
+        <md-dialog-actions>
+            <input id="input-file-id" multiple type="file" ng-model="pc.photoToUpload" accept="image/*" />
+            <md-button ng-click="pc.uploadPhoto()" class="md-raised md-primary">Upload</md-button>
+        </md-dialog-actions>
+
+    </form>
+</md-dialog>
