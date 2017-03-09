@@ -1,8 +1,11 @@
 /*jshint esversion: 6 */
-angular.module('app').controller('AlbumController', ['$http', '$scope', '$mdDialog', function($http, $scope, $mdDialog) {
+angular.module('app').controller('AlbumController', ['$http', '$scope', '$mdDialog', 'PhotoFactory', function($http, $scope, $mdDialog, PhotoFactory) {
     console.log("Album Controller Started");
+
+    const photoFactory = PhotoFactory;
+
     let self = this;
-    // self.albums = [1, 2, 3];
+    self.data = photoFactory.data;
 
     var albumBucketName = 'photo-app-aws';
     var bucketRegion = 'us-east-1';
@@ -18,29 +21,21 @@ angular.module('app').controller('AlbumController', ['$http', '$scope', '$mdDial
     });
 
     function listAlbums() {
-        let listObjectsPromise = s3.listObjects({
-                Delimiter: '/'
-            })
-            .promise();
-        listObjectsPromise
-            .then(function(data) {
-                self.albums = data.CommonPrefixes.map(function(commonPrefix) {
-                    var prefix = commonPrefix.Prefix;
-                    var albumName = decodeURIComponent(prefix.replace('/', ''));
-                    return albumName;
-                });
-                console.log('albums', self.albums);
+        console.log('List Albums');
+        photoFactory.listAlbums()
+            .then(function(response) {
+                console.log('album data from controller:', self.data);
                 $scope.$apply();
             })
             .catch(function(err) {
-                return alert('There was an error listing your albums: ' + err.message);
+                alert('There was an error listing your albums: ' + err.message);
             });
     }
 
     listAlbums();
 
     function createAlbum(albumName) {
-        console.log('create album:', albumName);
+        console.log('create album AlbumController:', albumName);
         albumName = albumName.trim();
         if (!albumName) {
             return alert('Album names must contain at least one non-space character.');
@@ -48,26 +43,9 @@ angular.module('app').controller('AlbumController', ['$http', '$scope', '$mdDial
         if (albumName.indexOf('/') !== -1) {
             return alert('Album names cannot contain slashes.');
         }
-        var albumKey = encodeURIComponent(albumName) + '/';
-        s3.headObject({
-            Key: albumKey
-        }, function(err, data) {
-            if (!err) {
-                return alert('Album already exists.');
-            }
-            if (err.code !== 'NotFound') {
-                return alert('There was an error creating your album: ' + err.message);
-            }
-            s3.putObject({
-                Key: albumKey
-            }, function(err, data) {
-                if (err) {
-                    return alert('There was an error creating your album: ' + err.message);
-                }
-                alert('Successfully created album.');
-                viewAlbum(albumName);
-            });
-        });
+        photoFactory.createAlbum(albumName);
+        listAlbums();
+        viewAlbum(albumName);
     }
 
     function viewAlbum(albumName) {
@@ -76,31 +54,10 @@ angular.module('app').controller('AlbumController', ['$http', '$scope', '$mdDial
     }
 
     self.deleteAlbum = function(albumName) {
-        var albumKey = encodeURIComponent(albumName) + '/';
-        s3.listObjects({
-            Prefix: albumKey
-        }, function(err, data) {
-            if (err) {
-                return alert('There was an error deleting your album: ', err.message);
-            }
-            var objects = data.Contents.map(function(object) {
-                return {
-                    Key: object.Key
-                };
-            });
-            s3.deleteObjects({
-                Delete: {
-                    Objects: objects,
-                    Quiet: true
-                }
-            }, function(err, data) {
-                if (err) {
-                    return alert('There was an error deleting your album: ', err.message);
-                }
-                alert('Successfully deleted album.');
-                listAlbums();
-            });
-        });
+        photoFactory.deleteAlbum(albumName);
+        listAlbums();
+        console.log('albums', self.data.albums);
+        // window.location.reload();
     }
 
     self.showPrompt = function(ev) {
