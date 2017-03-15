@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-angular.module('app').controller('AlbumController', ['$scope', '$mdDialog', 'PhotoFactory', function($scope, $mdDialog, PhotoFactory) {
+angular.module('app').controller('AlbumController', ['$scope', '$window', '$mdDialog', 'PhotoFactory', function($scope, $window, $mdDialog, PhotoFactory) {
     console.log("Album Controller Started");
 
     const photoFactory = PhotoFactory;
@@ -42,7 +42,7 @@ angular.module('app').controller('AlbumController', ['$scope', '$mdDialog', 'Pho
 
     function viewAlbum(albumName) {
         console.log('view ', albumName);
-        window.location = '#!/photo/' + albumName;
+        window.location = '#/photo/' + albumName;
     }
 
     self.deleteAlbum = function(albumName) {
@@ -72,6 +72,10 @@ angular.module('app').controller('AlbumController', ['$scope', '$mdDialog', 'Pho
                 self.status = 'Enter an album name.';
             });
     };
+
+    self.goBack = function() {
+        $window.history.back();
+    }
 
 
 }]);

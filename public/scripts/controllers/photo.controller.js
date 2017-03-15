@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '$mdDialog', 'PhotoFactory', function($routeParams, $scope, $mdDialog, PhotoFactory) {
+angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '$window', '$mdDialog', 'PhotoFactory', function($routeParams, $scope, $window, $mdDialog, PhotoFactory) {
     console.log("Photo Controller Started");
 
     const photoFactory = PhotoFactory;
@@ -11,7 +11,6 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     self.photoFile = "empty";
     self.photoToUpload;
     self.addMessage = "Pick a photo to upload";
-    self.filePicked = false;
 
     viewAlbum(self.albumName);
 
@@ -53,9 +52,8 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     };
 
     self.zoomPhoto = function(ev, index) {
-        self.zoomPhoto = self.photos[index];
+        self.zoomPhoto = self.data.photos[index];
         $mdDialog.show({
-            controller: DialogController,
             scope: $scope,
             preserveScope: true,
             templateUrl: 'views/templates/zoomphoto.template.html',
@@ -68,7 +66,6 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
 
     self.addPhoto = function(ev) {
         $mdDialog.show({
-            controller: DialogController,
             scope: $scope,
             preserveScope: true,
             templateUrl: 'views/templates/addphoto.template.html',
@@ -79,12 +76,12 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
         });
     };
 
-    function DialogController($scope, $mdDialog) {
-        $scope.cancel = function() {
-            $mdDialog.cancel();
-            self.zoomPhoto = {};
-            window.location.reload();
-        };
+    self.cancel = function() {
+        $mdDialog.hide();
+    };
+
+    self.goBack = function() {
+        $window.history.back();
     }
 
 }]);
