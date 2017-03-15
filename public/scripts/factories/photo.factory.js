@@ -18,7 +18,7 @@ app.factory("PhotoFactory", function($http) {
         return $http({
                 method: 'POST',
                 url: '/album',
-                data: albumName
+                data: { 'albumName': albumName }
             })
             .then((response) => listAlbums())
             .catch((err) => console.log('Unable to add album', err));

@@ -4,6 +4,12 @@ const router = express.Router();
 const pg = require('pg');
 const config = require('../modules/pg-config');
 const AWS = require('aws-sdk');
+const shortid = require('shortid');
+
+
+console.log('here i am');
+const pool = new pg.Pool(config.pg);
+console.log(pool);
 
 AWS.config.update({
     secretAccessKey: process.env.AWSSecretKey,
@@ -15,6 +21,7 @@ AWS.config.apiVersions = {
 };
 
 const s3 = new AWS.S3();
+let s3Name = '';
 
 router.get("/", function(req, res) {
     let params = {
@@ -36,13 +43,28 @@ router.get("/", function(req, res) {
     });
 });
 
+router.post("/", function(req, res, next) {
+    console.log('req.body:', req.body);
+    let s3Name = shortid.generate() + '_' + req.body.albumName;
+    console.log('s3Name:', s3Name);
+    pool.query('INSERT INTO album (name, s3_name) VALUES ($1, $2)', [req.body.albumName, s3Name], function(err, result) {
+        if (err) {
+            console.log('Error inserting album', err);
+            res.sendStatus(500);
+        } else {
+            next();
+        }
+    });
+});
+
 router.post("/", function(req, res) {
     let albumKey = encodeURIComponent(req.body.albumName) + '/';
+    console.log('albumKey:', albumKey);
     let params = {
         Bucket: 'photo-app-aws',
         Key: albumKey
     };
-    s3.headObject(params, function(err, data) {
+    s3.headObject(params, function(err, data, next) {
         if (!err) {
             console.log('ERROR: The album has already been created.')
             res.sendStatus(302);
@@ -57,10 +79,13 @@ router.post("/", function(req, res) {
                 res.sendStatus(500);
             }
             console.log('Successfully created album.');
-            res.sendStatus(200);
+            res.sendStatus(201);
         });
     });
 });
+
+
+
 
 router.delete("/:albumName", function(req, res) {
     var albumKey = encodeURIComponent(req.params.albumName) + '/';

@@ -14,7 +14,7 @@ app.get('/', function(req, res) {
 });
 
 app.use(express.static('public'));
-app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/album', album);
