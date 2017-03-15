@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '$mdDialog', 'PhotoFactory', function($routeParams, $scope, $mdDialog, PhotoFactory) {
+angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '$window', '$mdDialog', 'PhotoFactory', function($routeParams, $scope, $window, $mdDialog, PhotoFactory) {
     console.log("Photo Controller Started");
 
     const photoFactory = PhotoFactory;
@@ -10,6 +10,7 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     self.albumName = $routeParams.album;
     self.photoFile = "empty";
     self.photoToUpload;
+    self.addMessage = "Pick a photo to upload";
 
     viewAlbum(self.albumName);
 
@@ -22,18 +23,21 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     self.uploadPhoto = function() {
         var files = document.getElementById('input-file-id').files;
         if (!files.length) {
-            return alert('Please choose a file to upload first.');
+            // return alert('Please choose a file to upload first.');
+            self.addMessage = "Please choose a file to upload first.";
+        } else {
+            let fd = new FormData();
+            fd.append('file', files[0]);
+            fd.append('fileName', files[0].name);
+            fd.append('albumName', self.albumName);
+            photoFactory.uploadPhoto(fd)
+                .then((response) => {
+                    alert('Successfully uploaded photo.');
+                    viewAlbum(self.albumName);
+                    $mdDialog.cancel();
+                })
+                .catch((err) => alert('There was an error uploading your photos ' + err.message));
         }
-        let fd = new FormData();
-        fd.append('file', files[0]);
-        fd.append('fileName', files[0].name);
-        fd.append('albumName', self.albumName);
-        photoFactory.uploadPhoto(fd)
-            .then((response) => {
-                alert('Successfully uploaded photo.');
-                viewAlbum(self.albumName);
-            })
-            .catch((err) => alert('There was an error uploading your photos ' + err.message));
     }
 
     self.deletePhoto = function(photo) {
@@ -48,9 +52,8 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     };
 
     self.zoomPhoto = function(ev, index) {
-        self.zoomPhoto = self.photos[index];
+        self.zoomPhoto = self.data.photos[index];
         $mdDialog.show({
-            controller: DialogController,
             scope: $scope,
             preserveScope: true,
             templateUrl: 'views/templates/zoomphoto.template.html',
@@ -63,7 +66,6 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
 
     self.addPhoto = function(ev) {
         $mdDialog.show({
-            controller: DialogController,
             scope: $scope,
             preserveScope: true,
             templateUrl: 'views/templates/addphoto.template.html',
@@ -74,12 +76,12 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
         });
     };
 
-    function DialogController($scope, $mdDialog) {
-        $scope.cancel = function() {
-            $mdDialog.cancel();
-            self.zoomPhoto = {};
-            window.location.reload();
-        };
+    self.cancel = function() {
+        $mdDialog.hide();
+    };
+
+    self.goBack = function() {
+        $window.history.back();
     }
 
 }]);
