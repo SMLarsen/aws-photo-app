@@ -10,7 +10,7 @@
 
     <md-content layout-padding>
         <md-grid-list md-cols-gt-md="5" md-cols="3" md-cols-md="8" md-row-height-gt-md="1:1" md-row-height="4:3" md-gutter-gt-md="16px" md-gutter-md="8px" md-gutter="4px">
-            <md-grid-tile ng-repeat="album in ac.albums" style="background-color: #f5f5f5;">
+            <md-grid-tile ng-repeat="album in ac.data.albums" style="background-color: #f5f5f5;">
                 <div class="md-list-item-text">
                     <md-grid-tile-header>
                         <h3>{{ album }}</h3>

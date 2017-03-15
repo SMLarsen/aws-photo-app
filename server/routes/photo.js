@@ -1,97 +1,91 @@
 /*jshint esversion: 6 */
-var express = require('express');
-var router = express.Router();
-var pg = require('pg');
-var config = require('../modules/pg-config');
+const express = require('express');
+const router = express.Router();
+const pg = require('pg');
+const config = require('../modules/pg-config');
+const app = express();
 
-var pool = new pg.Pool(config.pg);
+const AWS = require('aws-sdk');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+const albumBucketName = 'photo-app-aws';
+const href = 'https://s3.amazonaws.com/';
+const bucketUrl = href + albumBucketName + '/';
 
-router.get("/:id", function(req, res) {
-    let projectID = req.params.id;
-    pool.connect()
-        .then(function(client) {
-            client.query('SELECT * FROM team WHERE team.project_id = $1', [projectID], function(err, result) {
-                if (err) {
-                    client.release();
-                    console.log('Error getting team data', err);
-                    res.sendStatus(500);
-                } else {
-                    client.release();
-                    res.send(result.rows);
-                }
-            });
-        });
+/*******************
+SET AWS CREDENTIALS
+********************/
+AWS.config.update({
+    secretAccessKey: process.env.AWSSecretKey,
+    accessKeyId: process.env.AWSAccessKeyId
 });
 
-router.get("/members/:id", function(req, res) {
-    let projectID = req.params.id;
-    pool.connect()
-        .then(function(client) {
-            client.query('SELECT project_id, team_size, team.name AS team_name, team_member.id AS member_id, team_id, person_id, cohort_id, person.name AS person_name FROM team JOIN team_member ON team.id = team_member.team_id JOIN person ON team_member.person_id = person.id WHERE team.project_id = $1 ORDER BY team_id', [projectID], function(err, result) {
-                if (err) {
-                    client.release();
-                    console.log('Error getting team data', err);
-                    res.sendStatus(500);
-                } else {
-                    client.release();
-                    res.send(result.rows);
-                }
-            });
+AWS.config.apiVersions = {
+    s3: '2006-03-01',
+};
+
+const s3 = new AWS.S3();
+
+router.get("/:albumName", function(req, res) {
+    let albumPhotosKey = encodeURIComponent(req.params.albumName) + '//';
+    let params = {
+        Bucket: albumBucketName,
+        Prefix: albumPhotosKey
+    };
+    s3.listObjects(params, function(err, data) {
+        if (err) {
+            console.log('There was an error viewing your album: ', err, err.stack); // an error occurred
+            res.sendStatus(402);
+        }
+        let href = this.request.httpRequest.endpoint.href;
+        let bucketUrl = href + albumBucketName + '/';
+        let photos = data.Contents.map(function(photo) {
+            let photoKey = photo.Key;
+            let photoUrl = bucketUrl + encodeURIComponent(photoKey);
+            return (photoUrl);
         });
+        res.send(photos);
+    });
 });
 
-module.exports = router;
-router.post("/", function(req, res) {
-    console.log('req.body:', req.body);
-    pool.connect()
-        .then((client) => {
-            client.query('INSERT INTO team (project_id, team_size, name) VALUES ($1, $2, $3)', [req.body.project_id, req.body.team_size, req.body.name], function(err, result) {
-                if (err) {
-                    client.release();
-                    console.log('Error inserting team', err);
-                    res.sendStatus(500);
-                } else {
-                    client.release();
-                    res.sendStatus(201);
-                }
-            });
-        });
+var upload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: albumBucketName,
+        key: function(req, file, cb) {
+            let fullFileName = req.params.albumName + '//' + file.originalname;
+            // console.log('fullFileName:', fullFileName);
+            cb(null, fullFileName);
+        },
+        contentType: multerS3.AUTO_CONTENT_TYPE,
+        acl: 'public-read'
+    })
 });
 
-module.exports = router;
-router.put("/", function(req, res) {
-    console.log('req.body:', req.body);
-    pool.connect()
-        .then((client) => {
-            client.query('UPDATE team SET project_id = $1, team_size = $2, name = $3 WHERE id = $4', [req.body.project_id, req.body.team_size, req.body.name, req.body.id], function(err, result) {
-                if (err) {
-                    client.release();
-                    console.log('Error updating team', err);
-                    res.sendStatus(500);
-                } else {
-                    client.release();
-                    res.sendStatus(202);
-                }
-            });
-        });
+router.post('/:albumName', upload.array('file', 1), function(req, res, next) {
+    // console.log('req.file:', req.files);
+    // console.log('req.body:', req.body);
+    // console.log('req.params:', req.params.albumName);
+    res.send("Uploaded!");
 });
 
-module.exports = router;
-router.delete("/", function(req, res) {
-    console.log('req.body:', req.body);
-    pool.connect()
-        .then((client) => {
-            client.query('DELETE FROM team WHERE id = $1', [req.body.id], function(err, result) {
-                if (err) {
-                    client.release();
-                    console.log('Error deleting team', err);
-                    res.sendStatus(500);
-                } else {
-                    client.release();
-                    res.sendStatus(202);
-                }
-            });
-        });
+router.delete("/:photo", function(req, res) {
+    let photo = req.params.photo;
+    let photoUrl = bucketUrl + encodeURIComponent(photo);
+    console.log('photo', photo);
+    let params = {
+        Bucket: albumBucketName,
+        Key: photo
+    }
+    s3.deleteObject(params, function(err, data) {
+        if (err) {
+            console.log('There was an error deleting your photo: ', err.message);
+            res.sendStatus(400);
+        }
+        console.log('Successfully deleted photo.');
+        res.sendStatus(200);
+    });
+
 });
 
 module.exports = router;

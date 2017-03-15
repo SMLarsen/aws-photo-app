@@ -9,25 +9,28 @@
 <div flex>
 
     <h1>Photos in {{pc.albumName}} Album</h1>
-    <input id="input-file-id" multiple type="file" ng-model="pc.photoToUpload" accept="image/*" />
-    <md-button ng-click="pc.uploadPhoto()" class="md-raised md-primary">Upload</md-button>
+    <form enctype="multipart/form-data">
+        <input name="file" type="file" id="input-file-id" accept="image/*" file-model="pc.photoToUpload">
+        <md-button ng-click="pc.uploadPhoto() " class="md-raised md-primary ">Upload</md-button>
+        {{pc.photoToUpload[0].name}}
+    </form>
 
     <md-content layout-padding>
-        <md-grid-list md-cols-gt-md="5" md-cols="3" md-cols-md="8" md-row-height-gt-md="1:1" md-row-height="4:3" md-gutter-gt-md="8px" md-gutter-md="4px" md-gutter="2px">
-            <md-grid-tile ng-repeat="photo in pc.photos">
-                <div layout="column">
-                    <div ng-click="pc.zoomPhoto($event, $index)">
-                        <div class="md-media-sm" layout-align="center center">
-                            <img class="listPhoto" src="{{photo}}" alt="photo">
+        <md-grid-list md-cols-gt-md="5 " md-cols="3 " md-cols-md="8 " md-row-height-gt-md="1:1 " md-row-height="4:3 " md-gutter-gt-md="8px " md-gutter-md="4px " md-gutter="2px ">
+            <md-grid-tile ng-repeat="photo in pc.data.photos ">
+                <div layout="column ">
+                    <div ng-click="pc.zoomPhoto($event, $index) ">
+                        <div class="md-media-sm " layout-align="center center ">
+                            <img class="listPhoto " src="{{photo}} " alt="photo ">
                         </div>
                     </div>
-                    <md-button ng-click="pc.deletePhoto(photo)" class="md-primary">Delete</md-button>
+                    <md-button ng-click="pc.deletePhoto(photo) " class="md-primary ">Delete</md-button>
                 </div>
             </md-grid-tile>
         </md-grid-list>
     </md-content>
 </div>
 
-<!--<md-button style="" ng-click="pc.addPhoto($event)" class="md-fab md-fab-bottom-right" aria-label="Back">
-    <md-icon md-svg-src="../assets/ic_add_white_24px.svg"></md-icon>
+<!--<md-button style=" " ng-click="pc.addPhoto($event) " class="md-fab md-fab-bottom-right " aria-label="Back ">
+    <md-icon md-svg-src="../assets/ic_add_white_24px.svg "></md-icon>
 </md-button>-->
