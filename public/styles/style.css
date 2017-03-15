@@ -9,3 +9,23 @@
     margin: 2px;
     /*background-color: lightgrey;*/
 }
+
+.inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+
+/*#add-photo-dialog {
+    height: 150px;
+}*/
+
+span.add-content {
+    /*margin: 50px;*/
+    text-align: center;
+    padding 20px;
+}

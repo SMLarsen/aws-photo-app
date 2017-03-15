@@ -1,4 +1,4 @@
-<md-dialog aria-label="Picture Zoom" flex="55">
+<md-dialog id="add-photo-dialog" aria-label="Picture Zoom" flex="55">
     <form ng-cloak>
         <md-toolbar>
             <div class="md-toolbar-tools">
@@ -10,13 +10,17 @@
             </div>
         </md-toolbar>
 
-        <md-dialog-content>
-            <p>Choose file to upload</p>
+        <md-dialog-content flex="75" layout="row" layout-align="center center">
+            <br><br><br>
+            <span class="add-content" ng-show="!pc.photoToUpload">{{pc.addMessage}}</span>
+            <span class="add-content" ng-show="pc.photoToUpload">File to upload: {{pc.photoToUpload[0].name}}</span>
+            <br><br><br>
         </md-dialog-content>
 
-        <md-dialog-actions>
-            <input id="input-file-id" multiple type="file" ng-model="pc.photoToUpload" accept="image/*" />
-            <md-button ng-click="pc.uploadPhoto()" class="md-raised md-primary">Upload</md-button>
+        <md-dialog-actions layout="row" layout-align="space-around end">
+            <input type="file" id="input-file-id" style="display: none;" file-model="pc.photoToUpload" />
+            <md-button ng-show="!pc.photoToUpload" onclick="document.getElementById('input-file-id').click();" class="md-raised md-primary ">Browse...</md-button>
+            <md-button ng-show="pc.photoToUpload" ng-click="pc.uploadPhoto()" class="md-raised md-primary ">Upload</md-button>
         </md-dialog-actions>
 
     </form>
