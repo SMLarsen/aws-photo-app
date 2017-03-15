@@ -2,92 +2,65 @@
 app.factory("PhotoFactory", function($http) {
     console.log('PhotoFactory started');
 
-    const albumBucketName = 'photo-app-aws';
-    const bucketRegion = 'us-east-1';
-    const IdentityPoolId = 'us-east-1:3f84d793-7a2a-4d80-ade0-1c5f223e68ca';
-
     let photoData = {
         albums: [],
         photos: [],
     };
 
-    AWS.config.update({});
-
-    let s3 = new AWS.S3({
-        apiVersion: '2006-03-01',
-        params: {
-            Bucket: albumBucketName
-        }
-    });
-
     function listAlbums() {
-        let listObjectsPromise = s3.listObjects({
-                Delimiter: '/'
-            })
-            .promise();
-        return listObjectsPromise
-            .then(function(data) {
-                photoData.albums = data.CommonPrefixes.map(function(commonPrefix) {
-                    let prefix = commonPrefix.Prefix;
-                    let albumName = decodeURIComponent(prefix.replace('/', ''));
-                    return albumName;
-                });
-                console.log('albums', photoData.albums);
-                return;
-            })
-            .catch((err) => console.log('There was an error listing your albums: ' + err.message));
+        return $http.get('/album')
+            .then((response) => photoData.albums = response.data)
+            .catch((err) => console.log('Unable to retrieve albums', err));
     }
 
     function createAlbum(albumName) {
         console.log('factory create album:', albumName);
-        let albumKey = encodeURIComponent(albumName) + '/';
-        return s3.headObject({
-            Key: albumKey
-        }, function(err, data) {
-            if (!err) {
-                return alert('Album already exists.');
-            }
-            if (err.code !== 'NotFound') {
-                return alert('There was an error creating your album: ' + err.message);
-            }
-            s3.putObject({
-                Key: albumKey
-            }, function(err, data) {
-                if (err) {
-                    return alert('There was an error creating your album: ' + err.message);
-                }
-                alert('Successfully created album.');
-                return;
-            });
-        });
+        return $http({
+                method: 'POST',
+                url: '/album',
+                data: albumName
+            })
+            .then((response) => listAlbums())
+            .catch((err) => console.log('Unable to add album', err));
     }
 
     function deleteAlbum(albumName) {
-        let albumKey = encodeURIComponent(albumName) + '/';
-        s3.listObjects({
-            Prefix: albumKey
-        }, function(err, data) {
-            if (err) {
-                return alert('There was an error deleting your album: ', err.message);
-            }
-            let objects = data.Contents.map(function(object) {
-                return {
-                    Key: object.Key
-                };
-            });
-            return s3.deleteObjects({
-                Delete: {
-                    Objects: objects,
-                    Quiet: true
-                }
-            }, function(err, data) {
-                if (err) {
-                    return alert('There was an error deleting your album: ', err.message);
-                }
-                alert('Successfully deleted album.');
-                return;
-            });
-        });
+        return $http({
+                method: 'DELETE',
+                url: '/album/' + albumName
+            })
+            .then((response) => {
+                listAlbums();
+                console.log('response', response);
+            })
+            .catch((err) => console.log('Unable to delete album', err));
+    }
+
+    function viewAlbum(albumName) {
+        console.log('viewAlbum:', albumName);
+        return $http.get('/photo/' + albumName)
+            .then((response) => photoData.photos = response.data)
+            .catch((err) => console.log('Unable to retrieve photos', err));
+    }
+
+    function uploadPhoto(file) {
+        return $http({
+                method: 'POST',
+                url: '/photo/' + file.get('albumName'),
+                data: file,
+                headers: { 'Content-Type': undefined }
+            })
+            .catch((err) => console.log('Unable to add photo', err));
+    }
+
+    function deletePhoto(albumName, photo) {
+        photo = photo.substring(photo.lastIndexOf("/") + 1);
+        return $http({
+                method: 'DELETE',
+                url: '/photo/' + photo
+            })
+            .then((data) => viewAlbum(albumName))
+            .catch((err) => alert('There was an error deleting your photo: ', err.message));
     }
 
     let publicApi = {
@@ -101,8 +74,14 @@ app.factory("PhotoFactory", function($http) {
         deleteAlbum: function(albumName) {
             return deleteAlbum(albumName);
         },
-        checkForAlbumDup: function(albumName) {
-            return checkForAlbumDup(albumName);
+        viewAlbum: function(albumName) {
+            return viewAlbum(albumName);
+        },
+        uploadPhoto: function(files) {
+            return uploadPhoto(files);
+        },
+        deletePhoto: function(albumName, photo) {
+            return deletePhoto(albumName, photo);
         }
     };
 

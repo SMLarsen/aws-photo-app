@@ -5,6 +5,7 @@ const app = express();
 const path = require('path');
 const bodyParser = require('body-parser');
 const photo = require('./routes/photo');
+const album = require('./routes/album');
 
 const portDecision = process.env.PORT || 5000;
 
@@ -13,8 +14,10 @@ app.get('/', function(req, res) {
 });
 
 app.use(express.static('public'));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+app.use('/album', album);
 app.use('/photo', photo);
 
 app.listen(portDecision, function() {

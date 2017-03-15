@@ -1,6 +1,13 @@
 /*jshint esversion: 6 */
 const app = angular.module('app', ['ngRoute', 'ngMaterial']);
 
+
+AWS.config.update({
+    accessKeyId: 'AKIAJHRJMQFBP24I5VBQ',
+    secretAccessKey: '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'
+});
+
+
 app.config(function($routeProvider, $mdThemingProvider) {
 
     // $mdThemingProvider.theme('default')
