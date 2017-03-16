@@ -11,6 +11,7 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     self.photoFile = "empty";
     self.photoToUpload;
     self.addMessage = "Pick a photo to upload";
+    self.statusOn = false;
 
     viewAlbum(self.albumName);
 
@@ -26,13 +27,16 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
             // return alert('Please choose a file to upload first.');
             self.addMessage = "Please choose a file to upload first.";
         } else {
+            self.statusOn = true;
             let fd = new FormData();
             fd.append('file', files[0]);
             fd.append('fileName', files[0].name);
             fd.append('albumName', self.albumName);
             photoFactory.uploadPhoto(fd)
                 .then((response) => {
+                    self.statusOn = false;
                     alert('Successfully uploaded photo.');
+                    // alert('Successfully uploaded photo.');
                     viewAlbum(self.albumName);
                     $mdDialog.cancel();
                 })

@@ -19,10 +19,9 @@
     z-index: -1;
 }
 
-
-/*#add-photo-dialog {
-    height: 150px;
-}*/
+#add-photo-dialog {
+    height: 300px;
+}
 
 span.add-content {
     /*margin: 50px;*/
