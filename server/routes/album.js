@@ -6,10 +6,7 @@ const config = require('../modules/pg-config');
 const AWS = require('aws-sdk');
 const shortid = require('shortid');
 
-
-console.log('here i am');
 const pool = new pg.Pool(config.pg);
-console.log(pool);
 
 AWS.config.update({
     secretAccessKey: process.env.AWSSecretKey,
@@ -23,25 +20,38 @@ AWS.config.apiVersions = {
 const s3 = new AWS.S3();
 let s3Name = '';
 
-router.get("/", function(req, res) {
-    let params = {
-        Bucket: 'photo-app-aws',
-        Delimiter: '/'
-    };
-    s3.listObjects(params, function(err, data) {
+router.get("/", function(req, res, next) {
+    console.log("album get");
+    pool.query('SELECT album.id, album.name, album.s3_name AS album_s3_name, album.cover_photo_id, photo.s3_name AS photo_s3_name FROM album LEFT OUTER JOIN photo ON photo.album_id = album.id', function(err, result) {
         if (err) {
-            console.log('There was an error listing your albums: ', err, err.stack); // an error occurred
-            res.sendStatus(402);
+            console.log('Error getting album', err);
+            res.sendStatus(500);
         } else {
-            let albums = data.CommonPrefixes.map(function(commonPrefix) {
-                let prefix = commonPrefix.Prefix;
-                let albumName = decodeURIComponent(prefix.replace('/', ''));
-                return albumName;
-            });
-            res.send(albums);
+            console.log("res.rows", result.rows);
+            res.send(result.rows);
         }
     });
 });
+
+// router.get("/", function(req, res) {
+//     let params = {
+//         Bucket: 'photo-app-aws',
+//         Delimiter: '/'
+//     };
+//     s3.listObjects(params, function(err, data) {
+//         if (err) {
+//             console.log('There was an error listing your albums: ', err, err.stack); // an error occurred
+//             res.sendStatus(402);
+//         } else {
+//             let albums = data.CommonPrefixes.map(function(commonPrefix) {
+//                 let prefix = commonPrefix.Prefix;
+//                 let albumName = decodeURIComponent(prefix.replace('/', ''));
+//                 return albumName;
+//             });
+//             res.send(albums);
+//         }
+//     });
+// });
 
 router.post("/", function(req, res, next) {
     console.log('req.body:', req.body);
