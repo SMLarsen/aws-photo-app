@@ -9,7 +9,10 @@ app.factory("PhotoFactory", function($http) {
 
     function listAlbums() {
         return $http.get('/album')
-            .then((response) => photoData.albums = response.data)
+            .then((response) => {
+                photoData.albums = response.data;
+                console.log("photoData.albums", photoData.albums);
+            })
             .catch((err) => console.log('Unable to retrieve albums', err));
     }
 
