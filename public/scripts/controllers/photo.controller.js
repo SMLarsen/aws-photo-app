@@ -7,16 +7,18 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     let self = this;
     self.data = photoFactory.data;
 
-    self.albumName = $routeParams.album;
+    self.albumID = $routeParams.albumid;
+    self.albumS3ID = $routeParams.albums3id;
+    console.log('photo params:', self.albumID, self.albumS3ID);
     self.photoFile = "empty";
-    self.photoToUpload;
+    self.photoToUpload = {};
     self.addMessage = "Pick a photo to upload";
     self.statusOn = false;
 
-    viewAlbum(self.albumName);
+    viewAlbum(self.albumID, self.albumS3ID);
 
-    function viewAlbum(albumName) {
-        photoFactory.viewAlbum(albumName)
+    function viewAlbum(albumID, albumS3ID) {
+        photoFactory.viewAlbum(albumID, albumS3ID)
             // .then((response) => console.log('photo data from controller:', self.data.photos))
             .catch((err) => alert('There was an error listing your photos: ' + err.message));
     }

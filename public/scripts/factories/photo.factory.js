@@ -5,6 +5,7 @@ app.factory("PhotoFactory", function($http) {
     let photoData = {
         albums: [],
         photos: [],
+        newAlbum: {}
     };
 
     function listAlbums() {
@@ -23,25 +24,28 @@ app.factory("PhotoFactory", function($http) {
                 url: '/album',
                 data: { 'albumName': albumName }
             })
-            .then((response) => listAlbums())
+            .then((response) => {
+                photoData.newAlbum = response.data;
+                listAlbums();
+            })
             .catch((err) => console.log('Unable to add album', err));
     }
 
-    function deleteAlbum(albumName) {
+    function deleteAlbum(albumID) {
         return $http({
                 method: 'DELETE',
-                url: '/album/' + albumName
+                url: '/album/' + albumID
             })
             .then((response) => {
                 listAlbums();
-                console.log('response', response);
+                // console.log('response', response);
             })
             .catch((err) => console.log('Unable to delete album', err));
     }
 
-    function viewAlbum(albumName) {
-        console.log('viewAlbum:', albumName);
-        return $http.get('/photo/' + albumName)
+    function viewAlbum(albumS3ID) {
+        console.log('viewAlbum:', albumS3ID);
+        return $http.get('/photo/' + albumS3ID)
             .then((response) => photoData.photos = response.data)
             .catch((err) => console.log('Unable to retrieve photos', err));
     }
@@ -74,8 +78,8 @@ app.factory("PhotoFactory", function($http) {
         createAlbum: function(albumName) {
             return createAlbum(albumName);
         },
-        deleteAlbum: function(albumName) {
-            return deleteAlbum(albumName);
+        deleteAlbum: function(albumID) {
+            return deleteAlbum(albumID);
         },
         viewAlbum: function(albumName) {
             return viewAlbum(albumName);

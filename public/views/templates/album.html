@@ -15,8 +15,9 @@
                     <md-grid-tile-header>
                         <h3>{{ album.name }}</h3>
                     </md-grid-tile-header>
-                    <md-button ng-href="#!/photo/{{album.name}}" class="md-primary">view Album</md-button>
-                    <md-button ng-click="ac.deleteAlbum(album.name)" class="md-primary">Delete Album</md-button>
+                    {{album.id}}/{{album.album_s3_name}}
+                    <md-button ng-click="ac.viewAlbum(album.id,album.album_s3_name)" class="md-primary">view Album</md-button>
+                    <md-button ng-click="ac.deleteAlbum(album.id)" class="md-primary">Delete Album</md-button>
                 </div>
             </md-grid-tile>
         </md-grid-list>

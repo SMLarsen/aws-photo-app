@@ -12,6 +12,8 @@ const albumBucketName = 'photo-app-aws';
 const href = 'https://s3.amazonaws.com/';
 const bucketUrl = href + albumBucketName + '/';
 
+const pool = new pg.Pool(config.pg);
+
 /*******************
 SET AWS CREDENTIALS
 ********************/

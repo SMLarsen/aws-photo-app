@@ -6,6 +6,8 @@ const config = require('../modules/pg-config');
 const AWS = require('aws-sdk');
 const shortid = require('shortid');
 
+let album = {};
+
 const pool = new pg.Pool(config.pg);
 
 AWS.config.update({
@@ -27,7 +29,7 @@ router.get("/", function(req, res, next) {
             console.log('Error getting album', err);
             res.sendStatus(500);
         } else {
-            console.log("res.rows", result.rows);
+            // console.log("res.rows", result.rows);
             res.send(result.rows);
         }
     });
@@ -57,18 +59,19 @@ router.post("/", function(req, res, next) {
     console.log('req.body:', req.body);
     let s3Name = shortid.generate() + '_' + req.body.albumName;
     console.log('s3Name:', s3Name);
-    pool.query('INSERT INTO album (name, s3_name) VALUES ($1, $2)', [req.body.albumName, s3Name], function(err, result) {
+    pool.query('INSERT INTO album (name, s3_name) VALUES ($1, $2) RETURNING *', [req.body.albumName, s3Name], function(err, result) {
         if (err) {
             console.log('Error inserting album', err);
             res.sendStatus(500);
         } else {
+            album = result.rows[0];
             next();
         }
     });
 });
 
 router.post("/", function(req, res) {
-    let albumKey = encodeURIComponent(req.body.albumName) + '/';
+    let albumKey = album.s3_name + '/';
     console.log('albumKey:', albumKey);
     let params = {
         Bucket: 'photo-app-aws',
@@ -89,16 +92,27 @@ router.post("/", function(req, res) {
                 res.sendStatus(500);
             }
             console.log('Successfully created album.');
-            res.sendStatus(201);
+            console.log('album', album)
+            res.send(album);
         });
     });
 });
 
+router.delete("/:albumID", function(req, res, next) {
+    console.log("album delete");
+    pool.query('DELETE FROM album WHERE id = $1 RETURNING *', [req.params.albumID], function(err, result) {
+        if (err) {
+            console.log('Error deleting album', err);
+            res.sendStatus(500);
+        } else {
+            album = result.rows[0];
+            next();
+        }
+    });
+});
 
-
-
-router.delete("/:albumName", function(req, res) {
-    var albumKey = encodeURIComponent(req.params.albumName) + '/';
+router.delete("/:albumID", function(req, res, next) {
+    var albumKey = album.s3_name + '/';
     s3.listObjects({
         Prefix: albumKey,
         Bucket: 'photo-app-aws'
