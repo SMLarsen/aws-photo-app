@@ -35,6 +35,19 @@ router.get("/", function(req, res, next) {
     });
 });
 
+router.get("/:id", function(req, res, next) {
+    console.log("single album get");
+    pool.query('SELECT album.id, album.name, album.s3_name AS album_s3_name, album.cover_photo_id, photo.s3_name AS photo_s3_name FROM album LEFT OUTER JOIN photo ON photo.album_id = album.id WHERE album.id = $1', [req.params.id], function(err, result) {
+        if (err) {
+            console.log('Error getting album', err);
+            res.sendStatus(500);
+        } else {
+            // console.log("res.rows", result.rows);
+            res.send(result.rows[0]);
+        }
+    });
+});
+
 // router.get("/", function(req, res) {
 //     let params = {
 //         Bucket: 'photo-app-aws',

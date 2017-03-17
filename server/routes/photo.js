@@ -4,7 +4,7 @@ const router = express.Router();
 const pg = require('pg');
 const config = require('../modules/pg-config');
 const app = express();
-
+const shortid = require('shortid');
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
@@ -28,11 +28,26 @@ AWS.config.apiVersions = {
 
 const s3 = new AWS.S3();
 
-router.get("/:albumName", function(req, res) {
-    let albumPhotosKey = encodeURIComponent(req.params.albumName) + '//';
+let photo = {};
+let photos = [];
+
+router.get("/:albumID/:albumS3ID", function(req, res, next) {
+    pool.query('SELECT * FROM photo WHERE album_id = $1', [req.params.id], function(err, result) {
+        if (err) {
+            console.log('Error getting album', err);
+            res.sendStatus(500);
+        } else {
+            photos = result.rows;
+            console.log("photos", photos);
+            next();
+        }
+    });
+});
+
+router.get("/:albumID/:albumS3ID", function(req, res) {
     let params = {
         Bucket: albumBucketName,
-        Prefix: albumPhotosKey
+        Prefix: req.params.albumS3ID
     };
     s3.listObjects(params, function(err, data) {
         if (err) {
@@ -55,20 +70,30 @@ var upload = multer({
         s3: s3,
         bucket: albumBucketName,
         key: function(req, file, cb) {
-            let fullFileName = req.params.albumName + '//' + file.originalname;
-            // console.log('fullFileName:', fullFileName);
-            cb(null, fullFileName);
+            photo.name = file.originalname;
+            photo.s3Name = encodeURIComponent(req.params.albumS3Name + '//' + shortid.generate() + '_' + file.originalname);
+            cb(null, photo.s3Name);
         },
         contentType: multerS3.AUTO_CONTENT_TYPE,
         acl: 'public-read'
     })
 });
 
-router.post('/:albumName', upload.array('file', 1), function(req, res, next) {
-    // console.log('req.file:', req.files);
-    // console.log('req.body:', req.body);
-    // console.log('req.params:', req.params.albumName);
-    res.send("Uploaded!");
+router.post('/:albumS3Name', upload.array('file', 1), function(req, res, next) {
+    photo.albumID = req.body.albumID;
+    photo.name = req.body.originalname;
+    photo.caption = req.body.caption;
+    next();
+});
+
+router.post("/:albumS3Name", function(req, res, next) {
+    pool.query('INSERT INTO photo (album_id, name, s3_name, caption) VALUES ($1, $2, $3, $4) RETURNING *', [photo.albumID, photo.name, photo.s3Name, photo.caption], function(err, result) {
+        if (err) {
+            console.log('Error inserting album', err);
+            res.sendStatus(500);
+        }
+        res.send(result.rows[0]);
+    });
 });
 
 router.delete("/:photo", function(req, res) {

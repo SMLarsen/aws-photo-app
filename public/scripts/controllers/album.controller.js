@@ -46,8 +46,9 @@ angular.module('app').controller('AlbumController', ['$scope', '$window', '$mdDi
             });
     }
 
-    self.viewAlbum = function(albumID, albumS3ID) {
-        let newViewURI = '#!/photo/' + albumID + '/' + albumS3ID;
+    self.viewAlbum = function(album) {
+        self.data.album = album;
+        let newViewURI = '#!/photo/' + album.id + '/' + album.album_s3_name;
         window.location = newViewURI;
     }
 

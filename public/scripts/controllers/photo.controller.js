@@ -9,13 +9,20 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
 
     self.albumID = $routeParams.albumid;
     self.albumS3ID = $routeParams.albums3id;
-    console.log('photo params:', self.albumID, self.albumS3ID);
     self.photoFile = "empty";
-    self.photoToUpload = {};
+    self.photoToUpload;
     self.addMessage = "Pick a photo to upload";
     self.statusOn = false;
 
-    viewAlbum(self.albumID, self.albumS3ID);
+    if (self.data.album.id === self.albumID) {
+        viewAlbum(self.albumID, self.albumS3ID);
+    } else {
+        photoFactory.getAlbum(self.albumID)
+            .then((response) => {
+                viewAlbum(self.albumID, self.albumS3ID);
+            });
+    }
+
 
     function viewAlbum(albumID, albumS3ID) {
         photoFactory.viewAlbum(albumID, albumS3ID)
@@ -32,8 +39,6 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
             self.statusOn = true;
             let fd = new FormData();
             fd.append('file', files[0]);
-            fd.append('fileName', files[0].name);
-            fd.append('albumName', self.albumName);
             photoFactory.uploadPhoto(fd)
                 .then((response) => {
                     self.statusOn = false;
