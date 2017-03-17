@@ -16,10 +16,10 @@
                 <div layout="column ">
                     <div ng-click="pc.zoomPhoto($event, $index) ">
                         <div class="md-media-sm " layout-align="center center ">
-                            <img class="listPhoto " src="{{photo}} " alt="photo ">
+                            <img class="listPhoto " src="{{photo.photoUrl}} " alt="photo ">
                         </div>
                     </div>
-                    <md-button ng-click="pc.deletePhoto(photo) " class="md-primary ">Delete</md-button>
+                    <md-button ng-click="pc.deletePhoto(photo.id) " class="md-primary ">Delete</md-button>
                 </div>
             </md-grid-tile>
         </md-grid-list>

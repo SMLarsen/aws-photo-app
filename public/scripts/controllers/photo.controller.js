@@ -51,8 +51,8 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
         }
     }
 
-    self.deletePhoto = function(photo) {
-        photoFactory.deletePhoto(self.albumName, photo)
+    self.deletePhoto = function(photoID) {
+        photoFactory.deletePhoto(photoID)
             .then((data) => {
                 alert('Successfully deleted photo.');
                 viewAlbum(self.albumID, self.albumS3ID);

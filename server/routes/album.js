@@ -23,55 +23,29 @@ const s3 = new AWS.S3();
 let s3Name = '';
 
 router.get("/", function(req, res, next) {
-    console.log("album get");
     pool.query('SELECT album.id, album.name, album.s3_name AS album_s3_name, album.cover_photo_id, photo.s3_name AS photo_s3_name FROM album LEFT OUTER JOIN photo ON photo.album_id = album.id', function(err, result) {
         if (err) {
             console.log('Error getting album', err);
             res.sendStatus(500);
         } else {
-            // console.log("res.rows", result.rows);
             res.send(result.rows);
         }
     });
 });
 
 router.get("/:id", function(req, res, next) {
-    console.log("single album get");
     pool.query('SELECT album.id, album.name, album.s3_name AS album_s3_name, album.cover_photo_id, photo.s3_name AS photo_s3_name FROM album LEFT OUTER JOIN photo ON photo.album_id = album.id WHERE album.id = $1', [req.params.id], function(err, result) {
         if (err) {
             console.log('Error getting album', err);
             res.sendStatus(500);
         } else {
-            // console.log("res.rows", result.rows);
             res.send(result.rows[0]);
         }
     });
 });
 
-// router.get("/", function(req, res) {
-//     let params = {
-//         Bucket: 'photo-app-aws',
-//         Delimiter: '/'
-//     };
-//     s3.listObjects(params, function(err, data) {
-//         if (err) {
-//             console.log('There was an error listing your albums: ', err, err.stack); // an error occurred
-//             res.sendStatus(402);
-//         } else {
-//             let albums = data.CommonPrefixes.map(function(commonPrefix) {
-//                 let prefix = commonPrefix.Prefix;
-//                 let albumName = decodeURIComponent(prefix.replace('/', ''));
-//                 return albumName;
-//             });
-//             res.send(albums);
-//         }
-//     });
-// });
-
 router.post("/", function(req, res, next) {
-    console.log('req.body:', req.body);
     let s3Name = shortid.generate() + '_' + req.body.albumName;
-    console.log('s3Name:', s3Name);
     pool.query('INSERT INTO album (name, s3_name) VALUES ($1, $2) RETURNING *', [req.body.albumName, s3Name], function(err, result) {
         if (err) {
             console.log('Error inserting album', err);
@@ -85,7 +59,6 @@ router.post("/", function(req, res, next) {
 
 router.post("/", function(req, res) {
     let albumKey = album.s3_name + '/';
-    console.log('albumKey:', albumKey);
     let params = {
         Bucket: 'photo-app-aws',
         Key: albumKey
@@ -104,15 +77,12 @@ router.post("/", function(req, res) {
                 console.log('ERROR: There was an error creating your album: ' + err.message);
                 res.sendStatus(500);
             }
-            console.log('Successfully created album.');
-            console.log('album', album)
             res.send(album);
         });
     });
 });
 
 router.delete("/:albumID", function(req, res, next) {
-    console.log("album delete");
     pool.query('DELETE FROM album WHERE id = $1 RETURNING *', [req.params.albumID], function(err, result) {
         if (err) {
             console.log('Error deleting album', err);
@@ -148,7 +118,6 @@ router.delete("/:albumID", function(req, res, next) {
                 console.log('There was an error deleting your album: ', err.message);
                 res.send(400);
             }
-            console.log('Successfully deleted album.');
             res.send(200);
         });
     });

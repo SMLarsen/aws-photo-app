@@ -32,49 +32,20 @@ let photo = {};
 let photos = [];
 
 router.get("/:albumID/:albumS3ID", function(req, res, next) {
-    console.log('========>', photos);
     pool.query('SELECT * FROM photo WHERE album_id = $1', [req.params.albumID], function(err, result) {
         if (err) {
             console.log('Error getting album', err);
             res.sendStatus(500);
         } else {
             photos = result.rows;
-            let href = 'https://s3.amazonaws.com/';
-            let bucketUrl = href + albumBucketName + '/';
             photos = photos.map(function(s3Photo) {
-                let photoKey = s3Photo.s3_name;
-                let photoUrl = bucketUrl + encodeURIComponent(photoKey);
-                return (photoUrl);
+                s3Photo.photoUrl = bucketUrl + s3Photo.s3_name;
+                return (s3Photo);
             });
-
-            console.log("sql photos", photos);
             res.send(photos);
-            // next();
         }
     });
 });
-
-// router.get("/:albumID/:albumS3ID", function(req, res) {
-//     let params = {
-//         Bucket: albumBucketName,
-//         Prefix: req.params.albumS3ID
-//     };
-//     s3.listObjects(params, function(err, data) {
-//         if (err) {
-//             console.log('There was an error viewing your album: ', err, err.stack); // an error occurred
-//             res.sendStatus(402);
-//         }
-//         let href = this.request.httpRequest.endpoint.href;
-//         let bucketUrl = href + albumBucketName + '/';
-//         let photos = data.Contents.map(function(photo) {
-//             let photoKey = photo.Key;
-//             let photoUrl = bucketUrl + encodeURIComponent(photoKey);
-//             return (photoUrl);
-//         });
-//         console.log('s3 photos:', photos);
-//         res.send(photos);
-//     });
-// });
 
 var upload = multer({
     storage: multerS3({
@@ -82,7 +53,6 @@ var upload = multer({
         bucket: albumBucketName,
         key: function(req, file, cb) {
             photo.name = file.originalname;
-            console.log('photo.name', photo.name);
             photo.s3Name = req.params.albumS3Name + '/' + shortid.generate() + '_' + file.originalname;
             cb(null, photo.s3Name);
         },
@@ -107,20 +77,30 @@ router.post("/:albumS3Name", function(req, res, next) {
     });
 });
 
-router.delete("/:photo", function(req, res) {
-    let photo = req.params.photo;
-    let photoUrl = bucketUrl + encodeURIComponent(photo);
-    console.log('photo', photo);
+router.delete("/:photoID", function(req, res, next) {
+    console.log("photo delete");
+    pool.query('DELETE FROM photo WHERE id = $1 RETURNING *', [req.params.photoID], function(err, result) {
+        if (err) {
+            console.log('Error deleting photo', err);
+            res.sendStatus(500);
+        } else {
+            photo = result.rows[0];
+            next();
+        }
+    });
+});
+
+router.delete("/:photoID", function(req, res) {
+    console.log('Deleting from S3:', photo.s3_name);
     let params = {
         Bucket: albumBucketName,
-        Key: photo
+        Key: photo.s3_name
     }
     s3.deleteObject(params, function(err, data) {
         if (err) {
             console.log('There was an error deleting your photo: ', err.message);
             res.sendStatus(400);
         }
-        console.log('Successfully deleted photo.');
         res.sendStatus(200);
     });
 

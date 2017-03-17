@@ -59,24 +59,6 @@ app.factory("PhotoFactory", function($http) {
             .catch((err) => console.log('Unable to retrieve photos', err));
     }
 
-    /*
-    Can all be done on server
-    1) Get photo DB rows 
-    2) Add rows to data.photos
-    3) Get s3 photos for album = albumS3ID 
-    4) Add photos to data.photos by matching photo.s3_name
-    */
-
-
-    /*
-    Can all be done on server
-    1) Create S3_name
-    2) Insert row to photos
-    3) Upload photo to S3 
-    4) Add photos to data.photos by matching photo.s3_name
-    */
-
-
     function uploadPhoto(file) {
         file.append('albumID', photoData.album.id);
         file.append('albumName', photoData.album.name);
@@ -91,13 +73,12 @@ app.factory("PhotoFactory", function($http) {
             .catch((err) => console.log('Unable to add photo', err));
     }
 
-    function deletePhoto(albumName, photo) {
-        photo = photo.substring(photo.lastIndexOf("/") + 1);
+    function deletePhoto(photoID) {
         return $http({
                 method: 'DELETE',
-                url: '/photo/' + photo
+                url: '/photo/' + photoID
             })
-            .then((data) => viewAlbum(albumName))
+            .then((data) => viewAlbum(photoData.album.id, photoData.album.album_s3_name))
             .catch((err) => alert('There was an error deleting your photo: ', err.message));
     }
 
@@ -121,8 +102,8 @@ app.factory("PhotoFactory", function($http) {
         uploadPhoto: function(files) {
             return uploadPhoto(files);
         },
-        deletePhoto: function(albumName, photo) {
-            return deletePhoto(albumName, photo);
+        deletePhoto: function(photoID) {
+            return deletePhoto(photoID);
         }
     };
 
