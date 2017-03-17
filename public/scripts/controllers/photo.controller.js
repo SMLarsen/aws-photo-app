@@ -44,7 +44,7 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
                     self.statusOn = false;
                     alert('Successfully uploaded photo.');
                     // alert('Successfully uploaded photo.');
-                    viewAlbum(self.albumName);
+                    viewAlbum(self.albumID, self.albumS3ID);
                     $mdDialog.cancel();
                 })
                 .catch((err) => alert('There was an error uploading your photos ' + err.message));
@@ -55,7 +55,7 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
         photoFactory.deletePhoto(self.albumName, photo)
             .then((data) => {
                 alert('Successfully deleted photo.');
-                viewAlbum(self.albumName);
+                viewAlbum(self.albumID, self.albumS3ID);
                 $mdDialog.cancel();
                 self.zoomPhoto = {};
             })

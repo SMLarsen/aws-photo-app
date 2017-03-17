@@ -32,38 +32,49 @@ let photo = {};
 let photos = [];
 
 router.get("/:albumID/:albumS3ID", function(req, res, next) {
-    pool.query('SELECT * FROM photo WHERE album_id = $1', [req.params.id], function(err, result) {
+    console.log('========>', photos);
+    pool.query('SELECT * FROM photo WHERE album_id = $1', [req.params.albumID], function(err, result) {
         if (err) {
             console.log('Error getting album', err);
             res.sendStatus(500);
         } else {
             photos = result.rows;
-            console.log("photos", photos);
-            next();
+            let href = 'https://s3.amazonaws.com/';
+            let bucketUrl = href + albumBucketName + '/';
+            photos = photos.map(function(s3Photo) {
+                let photoKey = s3Photo.s3_name;
+                let photoUrl = bucketUrl + encodeURIComponent(photoKey);
+                return (photoUrl);
+            });
+
+            console.log("sql photos", photos);
+            res.send(photos);
+            // next();
         }
     });
 });
 
-router.get("/:albumID/:albumS3ID", function(req, res) {
-    let params = {
-        Bucket: albumBucketName,
-        Prefix: req.params.albumS3ID
-    };
-    s3.listObjects(params, function(err, data) {
-        if (err) {
-            console.log('There was an error viewing your album: ', err, err.stack); // an error occurred
-            res.sendStatus(402);
-        }
-        let href = this.request.httpRequest.endpoint.href;
-        let bucketUrl = href + albumBucketName + '/';
-        let photos = data.Contents.map(function(photo) {
-            let photoKey = photo.Key;
-            let photoUrl = bucketUrl + encodeURIComponent(photoKey);
-            return (photoUrl);
-        });
-        res.send(photos);
-    });
-});
+// router.get("/:albumID/:albumS3ID", function(req, res) {
+//     let params = {
+//         Bucket: albumBucketName,
+//         Prefix: req.params.albumS3ID
+//     };
+//     s3.listObjects(params, function(err, data) {
+//         if (err) {
+//             console.log('There was an error viewing your album: ', err, err.stack); // an error occurred
+//             res.sendStatus(402);
+//         }
+//         let href = this.request.httpRequest.endpoint.href;
+//         let bucketUrl = href + albumBucketName + '/';
+//         let photos = data.Contents.map(function(photo) {
+//             let photoKey = photo.Key;
+//             let photoUrl = bucketUrl + encodeURIComponent(photoKey);
+//             return (photoUrl);
+//         });
+//         console.log('s3 photos:', photos);
+//         res.send(photos);
+//     });
+// });
 
 var upload = multer({
     storage: multerS3({
@@ -71,7 +82,8 @@ var upload = multer({
         bucket: albumBucketName,
         key: function(req, file, cb) {
             photo.name = file.originalname;
-            photo.s3Name = encodeURIComponent(req.params.albumS3Name + '//' + shortid.generate() + '_' + file.originalname);
+            console.log('photo.name', photo.name);
+            photo.s3Name = req.params.albumS3Name + '/' + shortid.generate() + '_' + file.originalname;
             cb(null, photo.s3Name);
         },
         contentType: multerS3.AUTO_CONTENT_TYPE,
@@ -81,7 +93,6 @@ var upload = multer({
 
 router.post('/:albumS3Name', upload.array('file', 1), function(req, res, next) {
     photo.albumID = req.body.albumID;
-    photo.name = req.body.originalname;
     photo.caption = req.body.caption;
     next();
 });
