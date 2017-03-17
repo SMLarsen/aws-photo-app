@@ -35,21 +35,26 @@ angular.module('app').controller('AlbumController', ['$scope', '$window', '$mdDi
         if (albumName.indexOf('/') !== -1) {
             return alert('Album names cannot contain slashes.');
         }
-        photoFactory.createAlbum(albumName);
-        listAlbums();
-        viewAlbum(albumName);
+        photoFactory.createAlbum(albumName)
+            .then((response) => {
+                console.log('newAlbum:', self.data);
+                listAlbums();
+                self.viewAlbum(self.data.newAlbum.id, self.data.newAlbum.s3_name);
+            })
+            .catch((err) => {
+                console.log('Error creating new album.');
+            });
     }
 
-    function viewAlbum(albumName) {
-        console.log('view ', albumName);
-        window.location = '#/photo/' + albumName;
+    self.viewAlbum = function(album) {
+        self.data.album = album;
+        let newViewURI = '#!/photo/' + album.id + '/' + album.album_s3_name;
+        window.location = newViewURI;
     }
 
-    self.deleteAlbum = function(albumName) {
-        photoFactory.deleteAlbum(albumName);
+    self.deleteAlbum = function(albumID) {
+        photoFactory.deleteAlbum(albumID);
         listAlbums();
-        console.log('albums', self.data.albums);
-        // window.location.reload();
     }
 
     self.showPrompt = function(ev) {

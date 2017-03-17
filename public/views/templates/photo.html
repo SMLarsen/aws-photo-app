@@ -1,7 +1,6 @@
 <md-toolbar>
     <div class="md-toolbar-tools">
         <md-button ng-click="pc.goBack()" aria-label="Go Back">
-            <!--<md-button ng-href="#!/album" aria-label="Go Back">-->
             Go Back
         </md-button>
     </div>
@@ -9,7 +8,7 @@
 
 <div flex>
 
-    <h1>Photos in Album: {{pc.albumName}}</h1>
+    <h1>Photos in Album: {{pc.data.album.name}}</h1>
 
     <md-content layout-padding>
         <md-grid-list md-cols-gt-md="5 " md-cols="3 " md-cols-md="8 " md-row-height-gt-md="1:1 " md-row-height="4:3 " md-gutter-gt-md="8px " md-gutter-md="4px " md-gutter="2px ">
@@ -17,10 +16,10 @@
                 <div layout="column ">
                     <div ng-click="pc.zoomPhoto($event, $index) ">
                         <div class="md-media-sm " layout-align="center center ">
-                            <img class="listPhoto " src="{{photo}} " alt="photo ">
+                            <img class="listPhoto " src="{{photo.photoUrl}} " alt="photo ">
                         </div>
                     </div>
-                    <md-button ng-click="pc.deletePhoto(photo) " class="md-primary ">Delete</md-button>
+                    <md-button ng-click="pc.deletePhoto(photo.id) " class="md-primary ">Delete</md-button>
                 </div>
             </md-grid-tile>
         </md-grid-list>

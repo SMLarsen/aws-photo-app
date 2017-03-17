@@ -7,16 +7,25 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     let self = this;
     self.data = photoFactory.data;
 
-    self.albumName = $routeParams.album;
+    self.albumID = $routeParams.albumid;
+    self.albumS3ID = $routeParams.albums3id;
     self.photoFile = "empty";
     self.photoToUpload;
     self.addMessage = "Pick a photo to upload";
     self.statusOn = false;
 
-    viewAlbum(self.albumName);
+    if (self.data.album.id === self.albumID) {
+        viewAlbum(self.albumID, self.albumS3ID);
+    } else {
+        photoFactory.getAlbum(self.albumID)
+            .then((response) => {
+                viewAlbum(self.albumID, self.albumS3ID);
+            });
+    }
 
-    function viewAlbum(albumName) {
-        photoFactory.viewAlbum(albumName)
+
+    function viewAlbum(albumID, albumS3ID) {
+        photoFactory.viewAlbum(albumID, albumS3ID)
             // .then((response) => console.log('photo data from controller:', self.data.photos))
             .catch((err) => alert('There was an error listing your photos: ' + err.message));
     }
@@ -30,25 +39,23 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
             self.statusOn = true;
             let fd = new FormData();
             fd.append('file', files[0]);
-            fd.append('fileName', files[0].name);
-            fd.append('albumName', self.albumName);
             photoFactory.uploadPhoto(fd)
                 .then((response) => {
                     self.statusOn = false;
                     alert('Successfully uploaded photo.');
                     // alert('Successfully uploaded photo.');
-                    viewAlbum(self.albumName);
+                    viewAlbum(self.albumID, self.albumS3ID);
                     $mdDialog.cancel();
                 })
                 .catch((err) => alert('There was an error uploading your photos ' + err.message));
         }
     }
 
-    self.deletePhoto = function(photo) {
-        photoFactory.deletePhoto(self.albumName, photo)
+    self.deletePhoto = function(photoID) {
+        photoFactory.deletePhoto(photoID)
             .then((data) => {
                 alert('Successfully deleted photo.');
-                viewAlbum(self.albumName);
+                viewAlbum(self.albumID, self.albumS3ID);
                 $mdDialog.cancel();
                 self.zoomPhoto = {};
             })

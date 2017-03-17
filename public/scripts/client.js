@@ -20,7 +20,7 @@ app.config(function($routeProvider, $mdThemingProvider) {
             controller: 'AlbumController',
             controllerAs: 'ac'
         })
-        .when('/photo/:album', {
+        .when('/photo/:albumid/:albums3id', {
             templateUrl: 'views/templates/photo.html',
             controller: 'PhotoController',
             controllerAs: 'pc'

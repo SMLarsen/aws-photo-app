@@ -13,10 +13,10 @@
             <md-grid-tile ng-repeat="album in ac.data.albums" style="background-color: #f5f5f5;">
                 <div class="md-list-item-text">
                     <md-grid-tile-header>
-                        <h3>{{ album }}</h3>
+                        <h3>{{ album.name }}</h3>
                     </md-grid-tile-header>
-                    <md-button ng-href="#!/photo/{{album}}" class="md-primary">view Album</md-button>
-                    <md-button ng-click="ac.deleteAlbum(album)" class="md-primary">Delete Album</md-button>
+                    <md-button ng-click="ac.viewAlbum(album)" class="md-primary">view Album</md-button>
+                    <md-button ng-click="ac.deleteAlbum(album.id)" class="md-primary">Delete Album</md-button>
                 </div>
             </md-grid-tile>
         </md-grid-list>
