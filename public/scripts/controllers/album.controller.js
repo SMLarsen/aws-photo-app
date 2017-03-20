@@ -38,7 +38,6 @@ angular.module('app').controller('AlbumController', ['$scope', '$window', '$mdDi
         photoFactory.createAlbum(albumName)
             .then((response) => {
                 console.log('newAlbum:', self.data);
-                listAlbums();
                 self.viewAlbum(self.data.newAlbum.id, self.data.newAlbum.s3_name);
             })
             .catch((err) => {
@@ -46,9 +45,8 @@ angular.module('app').controller('AlbumController', ['$scope', '$window', '$mdDi
             });
     }
 
-    self.viewAlbum = function(album) {
-        self.data.album = album;
-        let newViewURI = '#!/photo/' + album.id + '/' + album.album_s3_name;
+    self.viewAlbum = function(albumID, albumS3ID) {
+        let newViewURI = '#!/photo/' + albumID + '/' + albumS3ID;
         window.location = newViewURI;
     }
 
@@ -72,9 +70,6 @@ angular.module('app').controller('AlbumController', ['$scope', '$window', '$mdDi
         $mdDialog.show(confirm)
             .then(function(result) {
                 createAlbum(result);
-                self.status = 'Album to be created will be: ' + result + '.';
-            }, function() {
-                self.status = 'Enter an album name.';
             });
     };
 

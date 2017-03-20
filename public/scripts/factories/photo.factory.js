@@ -29,6 +29,8 @@ app.factory("PhotoFactory", function($http) {
             })
             .then((response) => {
                 photoData.newAlbum = response.data;
+                photoData.photos = [];
+                photoData.photo = {};
                 listAlbums();
             })
             .catch((err) => console.log('Unable to add album', err));
@@ -47,7 +49,7 @@ app.factory("PhotoFactory", function($http) {
     }
 
     function getAlbum(albumID) {
-        // console.log('viewAlbum:', albumS3ID);
+        console.log('getAlbum:', albumID);
         return $http.get('/album/' + albumID)
             .then((response) => photoData.album = response.data)
             .catch((err) => console.log('Unable to retrieve album', err));

@@ -14,9 +14,13 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     self.addMessage = "Pick a photo to upload";
     self.statusOn = false;
 
+    console.log('self.albumID', self.albumID);
+    console.log('self.data.album.id', self.data.album.id);
+
     if (self.data.album.id === self.albumID) {
         viewAlbum(self.albumID, self.albumS3ID);
     } else {
+        console.log('controller:', self.albumID[0]);
         photoFactory.getAlbum(self.albumID)
             .then((response) => {
                 viewAlbum(self.albumID, self.albumS3ID);
