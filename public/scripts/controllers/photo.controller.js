@@ -23,7 +23,6 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
             });
     }
 
-
     function viewAlbum(albumID, albumS3ID) {
         photoFactory.viewAlbum(albumID, albumS3ID)
             // .then((response) => console.log('photo data from controller:', self.data.photos))
@@ -36,6 +35,7 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
             // return alert('Please choose a file to upload first.');
             self.addMessage = "Please choose a file to upload first.";
         } else {
+
             self.statusOn = true;
             let fd = new FormData();
             fd.append('file', files[0]);
@@ -77,13 +77,10 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
 
     self.addPhoto = function(ev) {
         $mdDialog.show({
-            scope: $scope,
-            preserveScope: true,
-            templateUrl: 'views/templates/addphoto.template.html',
+            contentElement: '#addPhotoDialog',
             parent: angular.element(document.body),
             targetEvent: ev,
-            clickOutsideToClose: true,
-            fullscreen: self.customFullscreen // Only for -xs, -sm breakpoints.
+            clickOutsideToClose: true
         });
     };
 

@@ -15,6 +15,9 @@
                     <md-grid-tile-header>
                         <h3>{{ album.name }}</h3>
                     </md-grid-tile-header>
+                    <div class="md-media-sm" layout-align="center center">
+                        <img class="coverPhoto " src="{{ album.cover_photo }}" alt="cover photo ">
+                    </div>
                     <md-button ng-click="ac.viewAlbum(album)" class="md-primary">view Album</md-button>
                     <md-button ng-click="ac.deleteAlbum(album.id)" class="md-primary">Delete Album</md-button>
                 </div>
