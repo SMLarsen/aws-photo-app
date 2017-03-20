@@ -23,7 +23,7 @@ const s3 = new AWS.S3();
 let s3Name = '';
 
 router.get("/", function(req, res, next) {
-    pool.query('SELECT album.id, album.name, album.s3_name AS album_s3_name, album.cover_photo, photo.s3_name AS photo_s3_name FROM album LEFT OUTER JOIN photo ON photo.album_id = album.id', function(err, result) {
+    pool.query('SELECT id, name, s3_name, cover_photo FROM album', function(err, result) {
         if (err) {
             console.log('Error getting album', err);
             res.sendStatus(500);

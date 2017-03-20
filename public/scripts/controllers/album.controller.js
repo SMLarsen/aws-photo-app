@@ -7,11 +7,11 @@ angular.module('app').controller('AlbumController', ['$scope', '$window', '$mdDi
     let self = this;
     self.data = photoFactory.data;
 
-    var albumBucketName = 'photo-app-aws';
-    var bucketRegion = 'us-east-1';
-    var IdentityPoolId = 'us-east-1:3f84d793-7a2a-4d80-ade0-1c5f223e68ca';
+    const albumBucketName = 'photo-app-aws';
+    const bucketRegion = 'us-east-1';
+    const IdentityPoolId = 'us-east-1:3f84d793-7a2a-4d80-ade0-1c5f223e68ca';
 
-    var s3 = new AWS.S3({
+    const s3 = new AWS.S3({
         apiVersion: '2006-03-01',
         params: {
             Bucket: albumBucketName
@@ -20,7 +20,7 @@ angular.module('app').controller('AlbumController', ['$scope', '$window', '$mdDi
 
     function listAlbums() {
         photoFactory.listAlbums()
-            // .then((response) => console.log('album data from controller:', self.data))
+            .then((response) => console.log('album data from controller:', self.data))
             .catch((err) => alert('There was an error listing your albums: ' + err.message));
     }
 
