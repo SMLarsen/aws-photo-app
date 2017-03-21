@@ -14,15 +14,18 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     self.addMessage = "Pick a photo to upload";
     self.statusOn = false;
 
+    console.log('self.albumID', self.albumID);
+    console.log('self.data.album.id', self.data.album.id);
+
     if (self.data.album.id === self.albumID) {
         viewAlbum(self.albumID, self.albumS3ID);
     } else {
+        console.log('controller:', self.albumID[0]);
         photoFactory.getAlbum(self.albumID)
             .then((response) => {
                 viewAlbum(self.albumID, self.albumS3ID);
             });
     }
-
 
     function viewAlbum(albumID, albumS3ID) {
         photoFactory.viewAlbum(albumID, albumS3ID)
@@ -36,6 +39,7 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
             // return alert('Please choose a file to upload first.');
             self.addMessage = "Please choose a file to upload first.";
         } else {
+
             self.statusOn = true;
             let fd = new FormData();
             fd.append('file', files[0]);
@@ -77,13 +81,10 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
 
     self.addPhoto = function(ev) {
         $mdDialog.show({
-            scope: $scope,
-            preserveScope: true,
-            templateUrl: 'views/templates/addphoto.template.html',
+            contentElement: '#addPhotoDialog',
             parent: angular.element(document.body),
             targetEvent: ev,
-            clickOutsideToClose: true,
-            fullscreen: self.customFullscreen // Only for -xs, -sm breakpoints.
+            clickOutsideToClose: true
         });
     };
 

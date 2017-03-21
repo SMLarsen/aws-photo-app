@@ -3,11 +3,11 @@ const app = angular.module('app', ['ngRoute', 'ngMaterial']);
 
 app.config(function($routeProvider, $mdThemingProvider) {
 
-    // $mdThemingProvider.theme('default')
-    //   .primaryPalette('red')
-    //   .accentPalette('blue')
-    //   .warnPalette('yellow')
-    //   .dark();
+    $mdThemingProvider.theme('default')
+        .primaryPalette('teal')
+        .accentPalette('blue')
+        .warnPalette('yellow')
+        .dark();
 
     $routeProvider
         .when('/home', {

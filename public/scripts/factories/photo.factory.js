@@ -2,18 +2,27 @@
 app.factory("PhotoFactory", function($http) {
     console.log('PhotoFactory started');
 
+    const coverDefault = '../assets/aircraft.jpg';
+
     let photoData = {
         albums: [],
         album: {},
         photos: [],
         photo: {},
-        newAlbum: {}
+        newAlbum: {},
+        newPhoto: {}
     };
 
     function listAlbums() {
         return $http.get('/album')
             .then((response) => {
                 photoData.albums = response.data;
+                photoData.albums = photoData.albums.map(function(album) {
+                    if (album.cover_photo === null) {
+                        album.cover_photo = coverDefault;
+                    }
+                    return (album);
+                });
                 console.log("photoData.albums", photoData.albums);
             })
             .catch((err) => console.log('Unable to retrieve albums', err));
@@ -28,6 +37,8 @@ app.factory("PhotoFactory", function($http) {
             })
             .then((response) => {
                 photoData.newAlbum = response.data;
+                photoData.photos = [];
+                photoData.photo = {};
                 listAlbums();
             })
             .catch((err) => console.log('Unable to add album', err));
@@ -46,7 +57,7 @@ app.factory("PhotoFactory", function($http) {
     }
 
     function getAlbum(albumID) {
-        // console.log('viewAlbum:', albumS3ID);
+        console.log('getAlbum:', albumID);
         return $http.get('/album/' + albumID)
             .then((response) => photoData.album = response.data)
             .catch((err) => console.log('Unable to retrieve album', err));
@@ -60,16 +71,18 @@ app.factory("PhotoFactory", function($http) {
     }
 
     function uploadPhoto(file) {
+        file.append('coverPhoto', photoData.newPhoto.coverPhoto);
         file.append('albumID', photoData.album.id);
         file.append('albumName', photoData.album.name);
         file.append('albumS3Name', photoData.album.album_s3_name);
-        file.append('caption', photoData.album.caption);
+        file.append('caption', photoData.newPhoto.caption);
         return $http({
                 method: 'POST',
                 url: '/photo/' + photoData.album.album_s3_name,
                 data: file,
                 headers: { 'Content-Type': undefined }
             })
+            .then((response) => photoData.album = response.data)
             .catch((err) => console.log('Unable to add photo', err));
     }
 

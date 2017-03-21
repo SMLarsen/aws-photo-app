@@ -11,7 +11,7 @@
     <h1>Photos in Album: {{pc.data.album.name}}</h1>
 
     <md-content layout-padding>
-        <md-grid-list md-cols-gt-md="5 " md-cols="3 " md-cols-md="8 " md-row-height-gt-md="1:1 " md-row-height="4:3 " md-gutter-gt-md="8px " md-gutter-md="4px " md-gutter="2px ">
+        <md-grid-list md-cols="4" md-colspan-gt-md="1 " md-colspan-md="2 " md-colspan-xs="4" md-row-height-gt-md="1:1 " md-row-height="4:3 " md-gutter-gt-md="8px " md-gutter-md="4px " md-gutter="2px ">
             <md-grid-tile ng-repeat="photo in pc.data.photos ">
                 <div layout="column ">
                     <div ng-click="pc.zoomPhoto($event, $index) ">
@@ -26,6 +26,55 @@
     </md-content>
 </div>
 
-<md-button style=" " ng-click="pc.addPhoto($event) " class="md-fab md-fab-bottom-right " aria-label="Back ">
+<md-button style="position:fixed !important;" ng-click="pc.addPhoto($event) " class="md-fab md-fab-bottom-right " aria-label="Back ">
+    <!--<md-button style=" " ng-click="pc.addPhoto($event) " class="md-fab md-fab-bottom-right " aria-label="Back ">-->
     <md-icon md-svg-src="../assets/ic_add_white_24px.svg "></md-icon>
 </md-button>
+
+<div style="visibility: hidden">
+    <div class="md-dialog-container" id="addPhotoDialog">
+        <md-dialog flex="50">
+            <form ng-cloak>
+                <md-toolbar>
+                    <div class="md-toolbar-tools">
+                        <h2>Add Photo</h2>
+                        <span flex></span>
+                        <md-button class="md-icon-button" ng-click="pc.cancel()">
+                            <md-icon md-svg-src="../assets/ic_close_white_24px.svg" aria-label="Close dialog"></md-icon>
+                        </md-button>
+                    </div>
+                </md-toolbar>
+
+                <md-dialog-content layout-padding layout="column" layout-align="center center">
+                    <br><br><br>
+                    <span class="add-content" ng-show="!pc.photoToUpload">{{pc.addMessage}}</span>
+                    <span class="add-content" ng-show="pc.photoToUpload">File to upload: {{pc.photoToUpload[0].name}}</span>
+
+                    <div layout="row" layout-align="center center">
+                        <md-progress-circular style="margin:auto;" ng-show="pc.statusOn" md-diameter="50" md-mode="indeterminate"></md-progress-circular>
+                    </div>
+
+                    <md-input-container class="md-block" flex-gt-xs>
+                        <label>Caption</label>
+                        <input ng-model="pc.data.newPhoto.caption" aria-label="Caption">
+                    </md-input-container>
+
+                    <md-switch ng-model="pc.data.newPhoto.coverPhoto" aria-label="Use as album cover">
+                        Use as album cover
+                    </md-switch>
+
+                    <div layout="row" layout-align="center center">
+                    </div>
+                    <md-dialog-actions layout="row" layout-align="space-around end">
+                        <input type="file" id="input-file-id" style="display: none;" file-model="pc.photoToUpload" />
+                        <md-button ng-show="!pc.photoToUpload" onclick="document.getElementById('input-file-id').click();" class="md-raised md-primary ">Browse...</md-button>
+                        <md-button ng-show="pc.photoToUpload" ng-click="pc.uploadPhoto()" class="md-raised md-primary ">Upload</md-button>
+                    </md-dialog-actions>
+                </md-dialog-content>
+
+            </form>
+        </md-dialog>
+    </div>
+</div>
+
+</div>

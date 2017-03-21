@@ -52,8 +52,11 @@ var upload = multer({
         s3: s3,
         bucket: albumBucketName,
         key: function(req, file, cb) {
+            // photo.albumID = file.albumID;
             photo.name = file.originalname;
-            photo.s3Name = req.params.albumS3Name + '/' + shortid.generate() + '_' + file.originalname;
+            // photo.caption = file.caption;
+            // photo.coverPhoto = file.coverPhoto;
+            photo.s3Name = req.params.albumS3Name + 'x/' + shortid.generate() + '_' + file.originalname;
             cb(null, photo.s3Name);
         },
         contentType: multerS3.AUTO_CONTENT_TYPE,
@@ -62,18 +65,28 @@ var upload = multer({
 });
 
 router.post('/:albumS3Name', upload.array('file', 1), function(req, res, next) {
-    photo.albumID = req.body.albumID;
-    photo.caption = req.body.caption;
+    console.log('req.body', req.body);
     next();
 });
 
 router.post("/:albumS3Name", function(req, res, next) {
-    pool.query('INSERT INTO photo (album_id, name, s3_name, caption) VALUES ($1, $2, $3, $4) RETURNING *', [photo.albumID, photo.name, photo.s3Name, photo.caption], function(err, result) {
+    pool.query('INSERT INTO photo (album_id, name, s3_name, caption) VALUES ($1, $2, $3, $4) RETURNING *', [req.body.albumID, photo.name, photo.s3Name, req.body.caption], function(err, result) {
         if (err) {
             console.log('Error inserting album', err);
             res.sendStatus(500);
+        } else {
+            if (req.body.coverPhoto) {
+                photo.coverPhotoURL = bucketUrl + photo.s3Name;
+                pool.query('UPDATE album SET cover_photo = $1 WHERE id = $2', [photo.coverPhotoURL, req.body.albumID], function(err, result) {
+                    if (err) {
+                        console.log('Error updating album with cover photo', err);
+                        res.sendStatus(500);
+                    }
+                    console.log('result.rows', result.rows);
+                    res.send(result.rows[0]);
+                });
+            };
         }
-        res.send(result.rows[0]);
     });
 });
 

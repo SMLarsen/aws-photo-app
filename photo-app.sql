@@ -5,7 +5,7 @@ CREATE TABLE album (
 id SERIAL PRIMARY KEY,
 name VARCHAR(50),
 s3_name VARCHAR(100),
-cover_photo_id VARCHAR(100)
+cover_photo VARCHAR(100)
 );
 
 SELECT * FROM album;
@@ -26,4 +26,12 @@ LEFT OUTER JOIN photo ON photo.album_id = album.id
 ;
 
 INSERT INTO album (name, s3_name) VALUES ('England', 'asdsdfdsf');
+
+SELECT photo.id, photo.name, photo.s3_name, photo.caption
+FROM photo
+JOIN album ON photo.album_id = album.id 
+WHERE album.id = 7
+;
+
+
 
