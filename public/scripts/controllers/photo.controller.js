@@ -47,8 +47,9 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
                 .then((response) => {
                     self.statusOn = false;
                     alert('Successfully uploaded photo.');
-                    // alert('Successfully uploaded photo.');
                     viewAlbum(self.albumID, self.albumS3ID);
+                    self.data.newPhoto = {};
+                    self.photoToUpload = undefined;
                     $mdDialog.cancel();
                 })
                 .catch((err) => alert('There was an error uploading your photos ' + err.message));
@@ -60,14 +61,12 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
             .then((data) => {
                 alert('Successfully deleted photo.');
                 viewAlbum(self.albumID, self.albumS3ID);
-                $mdDialog.cancel();
-                self.zoomPhoto = {};
             })
             .catch((err) => alert('There was an error deleting your photo: ', err.message));
     };
 
     self.zoomPhoto = function(ev, index) {
-        self.zoomPhoto = self.data.photos[index];
+        self.photoToZoom = self.data.photos[index].photoUrl;
         $mdDialog.show({
             scope: $scope,
             preserveScope: true,
@@ -81,6 +80,8 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
 
     self.addPhoto = function(ev) {
         $mdDialog.show({
+            scope: $scope,
+            preserveScope: true,
             contentElement: '#addPhotoDialog',
             parent: angular.element(document.body),
             targetEvent: ev,
@@ -89,7 +90,8 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     };
 
     self.cancel = function() {
-        $mdDialog.hide();
+        $mdDialog.hide(alert, "finished");
+        alert = undefined;
     };
 
     self.goBack = function() {

@@ -15,6 +15,7 @@
             <md-grid-tile ng-repeat="photo in pc.data.photos ">
                 <div layout="column ">
                     <div ng-click="pc.zoomPhoto($event, $index) ">
+                        <!--<div ng-click="pc.zoomPhoto($eventt, $index) ">-->
                         <div class="md-media-sm " layout-align="center center ">
                             <img class="listPhoto " src="{{photo.photoUrl}} " alt="photo ">
                         </div>
@@ -26,6 +27,7 @@
     </md-content>
 </div>
 
+<!--<md-button style="position:fixed !important;" ng-click="pc.showDialog($event) " class="md-fab md-fab-bottom-right " aria-label="Back ">-->
 <md-button style="position:fixed !important;" ng-click="pc.addPhoto($event) " class="md-fab md-fab-bottom-right " aria-label="Back ">
     <!--<md-button style=" " ng-click="pc.addPhoto($event) " class="md-fab md-fab-bottom-right " aria-label="Back ">-->
     <md-icon md-svg-src="../assets/ic_add_white_24px.svg "></md-icon>
