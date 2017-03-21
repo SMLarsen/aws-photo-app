@@ -2,6 +2,8 @@
 app.factory("PhotoFactory", function($http) {
     console.log('PhotoFactory started');
 
+    const coverDefault = '../assets/aircraft.jpg';
+
     let photoData = {
         albums: [],
         album: {},
@@ -15,6 +17,12 @@ app.factory("PhotoFactory", function($http) {
         return $http.get('/album')
             .then((response) => {
                 photoData.albums = response.data;
+                photoData.albums = photoData.albums.map(function(album) {
+                    if (album.cover_photo === null) {
+                        album.cover_photo = coverDefault;
+                    }
+                    return (album);
+                });
                 console.log("photoData.albums", photoData.albums);
             })
             .catch((err) => console.log('Unable to retrieve albums', err));
