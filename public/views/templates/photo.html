@@ -49,8 +49,10 @@
 
                 <md-dialog-content layout-padding layout="column" layout-align="center center">
                     <br><br><br>
-                    <span class="add-content" ng-show="!pc.photoToUpload">{{pc.addMessage}}</span>
+                    <!--<span class="add-content" ng-show="!pc.photoToUpload">{{pc.addMessage}}</span>-->
                     <span class="add-content" ng-show="pc.photoToUpload">File to upload: {{pc.photoToUpload[0].name}}</span>
+                    <input type="file" id="input-file-id" style="display: none;" file-model="pc.photoToUpload" />
+                    <md-button ng-show="!pc.photoToUpload" onclick="document.getElementById('input-file-id').click();" class="md-raised md-primary ">Pick File to Upload</md-button>
 
                     <div layout="row" layout-align="center center">
                         <md-progress-circular style="margin:auto;" ng-show="pc.statusOn" md-diameter="50" md-mode="indeterminate"></md-progress-circular>
@@ -68,8 +70,6 @@
                     <div layout="row" layout-align="center center">
                     </div>
                     <md-dialog-actions layout="row" layout-align="space-around end">
-                        <input type="file" id="input-file-id" style="display: none;" file-model="pc.photoToUpload" />
-                        <md-button ng-show="!pc.photoToUpload" onclick="document.getElementById('input-file-id').click();" class="md-raised md-primary ">Browse...</md-button>
                         <md-button ng-show="pc.photoToUpload" ng-click="pc.uploadPhoto()" class="md-raised md-primary ">Upload</md-button>
                     </md-dialog-actions>
                 </md-dialog-content>
