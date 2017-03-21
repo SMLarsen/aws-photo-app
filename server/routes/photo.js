@@ -76,6 +76,7 @@ router.post("/:albumS3Name", function(req, res, next) {
             res.sendStatus(500);
         } else {
             if (req.body.coverPhoto === 'true') {
+                console.log('===========is a cover ========');
                 photo.coverPhotoURL = bucketUrl + photo.s3Name;
                 pool.query('UPDATE album SET cover_photo = $1 WHERE id = $2 RETURNING *', [photo.coverPhotoURL, req.body.albumID], function(err, result) {
                     if (err) {
@@ -85,7 +86,10 @@ router.post("/:albumS3Name", function(req, res, next) {
                     console.log('result.rows', result.rows);
                     res.send(result.rows[0]);
                 });
-            };
+            } else {
+                console.log('===========not a cover ========');
+                res.sendStatus(201);
+            }
         }
     });
 });

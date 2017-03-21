@@ -1,5 +1,9 @@
 /*jshint esversion: 6 */
-if (process.env.NODE_ENV == 'development') require('dotenv').config({ silent: true });
+console.log('-----------------------------');
+console.log('process.env', process.env);
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config({ silent: true });
+}
 // require('dotenv').config();
 const express = require('express');
 const app = express();
