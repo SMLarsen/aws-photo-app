@@ -75,7 +75,7 @@ router.post("/:albumS3Name", function(req, res, next) {
             console.log('Error inserting album', err);
             res.sendStatus(500);
         } else {
-            if (req.body.coverPhoto) {
+            if (req.body.coverPhoto === true) {
                 photo.coverPhotoURL = bucketUrl + photo.s3Name;
                 pool.query('UPDATE album SET cover_photo = $1 WHERE id = $2', [photo.coverPhotoURL, req.body.albumID], function(err, result) {
                     if (err) {

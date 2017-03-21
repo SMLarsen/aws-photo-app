@@ -79,6 +79,7 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     };
 
     self.addPhoto = function(ev) {
+        self.data.newPhoto.coverPhoto = false;
         $mdDialog.show({
             scope: $scope,
             preserveScope: true,
