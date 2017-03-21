@@ -1,5 +1,6 @@
 /*jshint esversion: 6 */
-require('dotenv').config();
+if (process.env.NODE_ENV == 'development') require('dotenv').config({ silent: true });
+// require('dotenv').config();
 const express = require('express');
 const app = express();
 const path = require('path');
