@@ -4,7 +4,7 @@
             <div class="md-toolbar-tools">
                 <h2>Photo Zoom</h2>
                 <span flex></span>
-                <md-button class="md-icon-button" ng-click="pc.deletePhoto(pc.zoomPhoto)">
+                <md-button class="md-icon-button" ng-click="pc.deletePhoto(pc.photoToZoom.id)">
                     <md-icon md-svg-src="../assets/delete.svg" aria-label="Delete photo"></md-icon>
                 </md-button>
                 <md-button class="md-icon-button" ng-click="pc.cancel()">
@@ -15,7 +15,7 @@
 
         <md-dialog-content>
             <div class="md-dialog-content">
-                <img style="margin: auto; width:100%;" alt="Zoomed photo" src="{{pc.photoToZoom}}">
+                <img style="margin: auto; width:100%;" alt="Zoomed photo" src="{{pc.photoToZoom.photoUrl}}">
                 <!--<img style="margin: auto; max-height: 100%; max-width: 100%;" alt="Zoomed photo" src="{{pc.zoomPhoto}}">-->
             </div>
         </md-dialog-content>

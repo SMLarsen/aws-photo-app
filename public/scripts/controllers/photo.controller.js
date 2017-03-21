@@ -61,12 +61,13 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
             .then((data) => {
                 alert('Successfully deleted photo.');
                 viewAlbum(self.albumID, self.albumS3ID);
+                $mdDialog.cancel();
             })
             .catch((err) => alert('There was an error deleting your photo: ', err.message));
     };
 
     self.zoomPhoto = function(ev, index) {
-        self.photoToZoom = self.data.photos[index].photoUrl;
+        self.photoToZoom = self.data.photos[index];
         $mdDialog.show({
             scope: $scope,
             preserveScope: true,
@@ -79,6 +80,7 @@ angular.module('app').controller('PhotoController', ['$routeParams', '$scope', '
     };
 
     self.addPhoto = function(ev) {
+        self.data.newPhoto.coverPhoto = false;
         $mdDialog.show({
             scope: $scope,
             preserveScope: true,
