@@ -9,7 +9,7 @@
 <div flex>
 
     <md-content layout-padding>
-        <md-grid-list md-cols-gt-md="5" md-cols="3" md-cols-md="8" md-row-height-gt-md="1:1" md-row-height="4:3" md-gutter-gt-md="16px" md-gutter-md="8px" md-gutter="4px">
+        <md-grid-list md-cols-gt-md="4" md-cols-md="3 " md-cols-xs="1 " md-cols-gt-xs="2" md-row-height-gt-md="1:1" md-row-height="4:3" md-gutter-gt-md="16px" md-gutter-md="8px" md-gutter="4px">
             <md-grid-tile ng-repeat="album in ac.data.albums" style="background-color: #f5f5f5;">
                 <div class="md-list-item-text">
                     <md-grid-tile-header>
@@ -18,7 +18,7 @@
                     <div class="md-media-sm" layout-align="center center">
                         <img class="coverPhoto " src="{{ album.cover_photo }}" alt="cover photo ">
                     </div>
-                    <md-grid-tile-footer>
+                    <md-grid-tile-footer layout-align="space-around start">
                         <md-button ng-click="ac.viewAlbum(album.id, album.s3_name)" class="md-primary">view Album</md-button>
                         <md-button ng-click="ac.deleteAlbum(album.id)" class="md-primary">Delete Album</md-button>
                     </md-grid-tile-footer>

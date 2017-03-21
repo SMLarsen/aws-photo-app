@@ -11,7 +11,7 @@
     <h1>Photos in Album: {{pc.data.album.name}}</h1>
 
     <md-content layout-padding>
-        <md-grid-list md-cols-gt-md="5 " md-cols="3 " md-cols-md="8 " md-row-height-gt-md="1:1 " md-row-height="4:3 " md-gutter-gt-md="8px " md-gutter-md="4px " md-gutter="2px ">
+        <md-grid-list md-cols="4" md-colspan-gt-md="1 " md-colspan-md="2 " md-colspan-xs="4" md-row-height-gt-md="1:1 " md-row-height="4:3 " md-gutter-gt-md="8px " md-gutter-md="4px " md-gutter="2px ">
             <md-grid-tile ng-repeat="photo in pc.data.photos ">
                 <div layout="column ">
                     <div ng-click="pc.zoomPhoto($event, $index) ">
