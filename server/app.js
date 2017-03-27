@@ -1,6 +1,4 @@
 /*jshint esversion: 6 */
-console.log('-----------------------------');
-console.log('process.env', process.env);
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config({ silent: true });
 }

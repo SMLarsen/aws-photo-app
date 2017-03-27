@@ -56,7 +56,7 @@ var upload = multer({
             photo.name = file.originalname;
             // photo.caption = file.caption;
             // photo.coverPhoto = file.coverPhoto;
-            photo.s3Name = req.params.albumS3Name + 'x/' + shortid.generate() + '_' + file.originalname;
+            photo.s3Name = req.params.albumS3Name + '/' + shortid.generate() + '_' + file.originalname;
             cb(null, photo.s3Name);
         },
         contentType: multerS3.AUTO_CONTENT_TYPE,
